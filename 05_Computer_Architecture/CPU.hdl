@@ -1,0 +1,150 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/5/CPU.hdl
+/**
+ * The Hack Central Processing unit (CPU).
+ * Parses the binary code in the instruction input and executes it according to the
+ * Hack machine language specification. In the case of a C-instruction, computes the
+ * function specified by the instruction. If the instruction specifies to read a memory
+ * value, the inM input is expected to contain this value. If the instruction specifies
+ * to write a value to the memory, sets the outM output to this value, sets the addressM
+ * output to the target address, and asserts the writeM output (when writeM = 0, any
+ * value may appear in outM).
+ * If the reset input is 0, computes the address of the next instruction and sets the
+ * pc output to that value. If the reset input is 1, sets pc to 0.
+ * Note: The outM and writeM outputs are combinational: they are affected by the
+ * instruction's execution during the current cycle. The addressM and pc outputs are
+ * clocked: although they are affected by the instruction's execution, they commit to
+ * their new values only in the next cycle.
+ */
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+	//// Replace this comment with your code.
+    // Determine whether it's an A-instruction or C-instruction
+    Not(in=instruction[15], out=isAInstruction);
+
+    // Handle A Register: load if (A-instruction) or (C-instruction with d1=1)
+    And(a=instruction[15], b=instruction[5], out=cTypeLoadA);
+    Or(a=isAInstruction, b=cTypeLoadA, out=loadA);
+    
+    // Choose A register input: instruction (A-instr) or ALU out (C-instr)
+    Mux16(a=instruction, b=aluOut, sel=instruction[15], out=aInput);
+    ARegister(in=aInput, load=loadA, out=aOut);
+
+    // D register load: only when d2 == 1 in C-instruction
+    And(a=instruction[15], b=instruction[4], out=loadD);
+    DRegister(in=aluOut, load=loadD, out=dOut);
+
+    // Mux for ALU y-input: select A register or inM, based on instruction[12] (a-bit)
+    Mux16(a=aOut, b=inM, sel=instruction[12], out=yInput);
+
+    // ALU operation
+    ALU(
+        x=dOut, 
+        y=yInput,
+        zx=instruction[11],
+        nx=instruction[10],
+        zy=instruction[9],
+        ny=instruction[8],
+        f=instruction[7],
+        no=instruction[6],
+        out=aluOut,
+        out=outM,
+        zr=zr,
+        ng=ng
+    );
+
+    // writeM: only if C-instruction and d3 == 1
+    And(a=instruction[15], b=instruction[3], out=writeM);
+
+    // addressM = A register value (lower 15 bits)
+    And16(a=aOut, b[0]=true, b[1]=true, b[2]=true, b[3]=true,
+          b[4]=true, b[5]=true, b[6]=true, b[7]=true,
+          b[8]=true, b[9]=true, b[10]=true, b[11]=true,
+          b[12]=true, b[13]=true, b[14]=true, b[15]=false,
+          out=addressMasked, out[0..14] = addressM);
+
+    // Jump logic
+    Not(in=zr, out=zrNot);
+    Not(in=ng, out=ngNot);
+    Not(in=instruction[2], out=j1Not);
+    Not(in=instruction[1], out=j2Not);
+    Not(in=instruction[0], out=j3Not);
+
+    // JGT: !zr & !ng & j1=0 j2=0 j3=1
+    And(a=zrNot, b=ngNot, out=condGt);
+    And(a=j1Not, b=j2Not, out=t1);
+    And(a=t1, b=instruction[0], out=t2);
+    And(a=t2, b=condGt, out=jgtTrue);
+
+    // JEQ: zr & j1=0 j2=1 j3=0
+    And(a=j1Not, b=instruction[1], out=t3);
+    And(a=t3, b=j3Not, out=t4);
+    And(a=t4, b=zr, out=jeqTrue);
+
+    // JGE: (zr | !ng) & j1=0 j2=1 j3=1
+    Or(a=zr, b=ngNot, out=condGe);
+    And(a=t3, b=instruction[0], out=t5);
+    And(a=t5, b=condGe, out=jgeTrue);
+
+    // JLT: ng & j1=1 j2=0 j3=0
+    And(a=instruction[2], b=j2Not, out=t6);
+    And(a=t6, b=j3Not, out=t7);
+    And(a=t7, b=ng, out=jltTrue);
+
+    // JNE: !zr & j1=1 j2=0 j3=1
+    And(a=instruction[2], b=j2Not, out=t8);
+    And(a=t8, b=instruction[0], out=t9);
+    And(a=t9, b=zrNot, out=jneTrue);
+
+    // JLE: (zr | ng) & j1=1 j2=1 j3=0
+    Or(a=zr, b=ng, out=condLe);
+    And(a=instruction[2], b=instruction[1], out=t10);
+    And(a=t10, b=j3Not, out=t11);
+    And(a=t11, b=condLe, out=jleTrue);
+
+    // JMP: j1=1 j2=1 j3=1 → unconditional
+    And(a=t10, b=instruction[0], out=jmpTrue);
+
+    // Combine all jump conditions
+    Or(a=jgtTrue, b=jeqTrue, out=o1);
+    Or(a=o1, b=jgeTrue, out=o2);
+    Or(a=o2, b=jltTrue, out=o3);
+    Or(a=o3, b=jneTrue, out=o4);
+    Or(a=o4, b=jleTrue, out=o5);
+    Or(a=o5, b=jmpTrue, out=doJump1);
+
+    And(a=instruction[15], b=jgtTrue, out=jgtC);
+    And(a=instruction[15], b=jeqTrue, out=jeqC);
+    And(a=instruction[15], b=jgeTrue, out=jgeC);
+    And(a=instruction[15], b=jltTrue, out=jltC);
+    And(a=instruction[15], b=jneTrue, out=jneC);
+    And(a=instruction[15], b=jleTrue, out=jleC);
+    And(a=instruction[15], b=jmpTrue, out=jmpC);
+
+    Or(a=jgtC, b=jeqC, out=or1);
+    Or(a=or1, b=jgeC, out=or2);
+    Or(a=or2, b=jltC, out=or3);
+    Or(a=or3, b=jneC, out=or4);
+    Or(a=or4, b=jleC, out=or5);
+    Or(a=or5, b=jmpC, out=doJump2);
+
+    And(a=doJump1, b=doJump2, out=doJump);
+
+    // PC: load if jump, else increment
+    Not(in=doJump, out=incPC);
+    PC(in=aOut, load=doJump, inc=incPC, reset=reset, out[0..14]=pc);
+}
