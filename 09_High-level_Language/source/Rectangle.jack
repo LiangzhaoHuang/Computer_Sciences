@@ -1,0 +1,129 @@
+/** Implements a graphical rectangle.
+    The rectangle has top-left x and y coordinates, and x, y sizes. */
+class Rectangle {
+
+   field int x, y; // screen location of the top-left corner of this rectangle
+   field int xsize, ysize; // x and y lengths of this rectangle, in pixels
+
+   /** Constructs and draws a new rectangle with a given location and size. */
+   constructor Rectangle new(int ax, int ay, int axsize, int aysize) {
+      let x = ax;
+      let y = ay;
+      let xsize = axsize;
+      let ysize = aysize;
+      do draw();
+      return this;
+   }
+
+   /** Disposes this rectangle. */
+   method void dispose() {
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   /** Draws this rectangle in its current (x,y) location */
+   method void draw() {
+      // Draws the rectangle using the color black
+      do Screen.setColor(true);
+      do Screen.drawRectangle(x, y, x + xsize, y + ysize);
+      return;
+   }
+
+   /** Erases this rectangle. */
+   method void erase() {
+      // Draws the rectangle using the color white (background color)
+      do Screen.setColor(false);
+      do Screen.drawRectangle(x, y, x + xsize, y + ysize);
+      return;
+   }
+
+   /** Increments the rectangle x length by 2 pixels (if possible). */
+   method void incXSize() {
+      if (((y + ysize) < 254) & ((x + xsize) < 510)) {
+         do erase();
+         let xsize = xsize + 2;
+         do draw();
+      }
+      return;
+   }
+
+   /** Decrements the rectangle x length by 2 pixels (if possible). */
+   method void decXSize() {
+      if (xsize > 2) {
+         do erase();
+         let xsize = xsize - 2;
+         do draw();
+      }
+      return;
+   }
+
+   /** Increments the rectangle y length by 2 pixels (if possible). */
+   method void incYSize() {
+      if (((y + ysize) < 254) & ((x + xsize) < 510)) {
+         do erase();
+         let ysize = ysize + 2;
+         do draw();
+      }
+      return;
+   }
+
+   /** Decrements the rectangle y length by 2 pixels (if possible). */
+   method void decYSize() {
+      if (ysize > 2) {
+         do erase();
+         let ysize = ysize - 2;
+         do draw();
+      }
+      return;
+   }
+
+   /** Moves this rectangle up by 2 pixels (if possible). */
+   method void moveUp() {
+      if (y > 1) {
+         // Erases the bottom two rows of this rectangle in its current location
+         do Screen.setColor(false);
+         do Screen.drawRectangle(x, (y + ysize) - 1, x + xsize, y + ysize);
+         let y = y - 2;
+         // Draws the top two rows of this rectangle in its new location
+         do Screen.setColor(true);
+         do Screen.drawRectangle(x, y, x + xsize, y + 1);
+      }
+      return;
+   }
+
+   /** Moves the rectangle down by 2 pixels (if possible). */
+   method void moveDown() {
+      if ((y + ysize) < 254) {
+         do Screen.setColor(false);
+         do Screen.drawRectangle(x, y, x + xsize, y + 1);
+         let y = y + 2;
+         do Screen.setColor(true);
+         do Screen.drawRectangle(x, (y + ysize) - 1, x + xsize, y + ysize);
+      }
+      return;
+   }
+
+   /** Moves the rectangle left by 2 pixels (if possible). */
+   method void moveLeft() {
+      if (x > 1) {
+         do Screen.setColor(false);
+         do Screen.drawRectangle((x + xsize) - 1, y, x + xsize, y + ysize);
+         let x = x - 2;
+         do Screen.setColor(true);
+         do Screen.drawRectangle(x, y, x + 1, y + ysize);
+      }
+      return;
+   }
+
+   /** Moves the rectangle right by 2 pixels (if possible). */
+   method void moveRight() {
+      if ((x + xsize) < 510) {
+         do Screen.setColor(false);
+         do Screen.drawRectangle(x, y, x + 1, y + ysize);
+         let x = x + 2;
+         do Screen.setColor(true);
+         do Screen.drawRectangle((x + xsize) - 1, y, x + xsize, y + ysize);
+      }
+      return;
+   }
+}

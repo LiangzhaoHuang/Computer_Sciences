@@ -1,0 +1,366 @@
+function Rectangle.new 0
+    push constant 4
+    call Memory.alloc 1
+    pop pointer 0
+    push argument 0
+    pop this 0
+    push argument 1
+    pop this 1
+    push argument 2
+    pop this 2
+    push argument 3
+    pop this 3
+    push pointer 0
+    call Rectangle.draw 1
+    pop temp 0
+    push pointer 0
+    return
+function Rectangle.dispose 0
+    push argument 0
+    pop pointer 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return
+function Rectangle.draw 0
+    push argument 0
+    pop pointer 0
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 1
+    push this 0
+    push this 2
+    add
+    push this 1
+    push this 3
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push constant 0
+    return
+function Rectangle.erase 0
+    push argument 0
+    pop pointer 0
+    push constant 0
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 1
+    push this 0
+    push this 2
+    add
+    push this 1
+    push this 3
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push constant 0
+    return
+function Rectangle.incXSize 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    push this 3
+    add
+    push constant 254
+    lt
+    push this 0
+    push this 2
+    add
+    push constant 510
+    lt
+    and
+    not
+    if-goto Rectangle_1
+    push pointer 0
+    call Rectangle.erase 1
+    pop temp 0
+    push this 2
+    push constant 2
+    add
+    pop this 2
+    push pointer 0
+    call Rectangle.draw 1
+    pop temp 0
+    goto Rectangle_0
+label Rectangle_1
+label Rectangle_0
+    push constant 0
+    return
+function Rectangle.decXSize 0
+    push argument 0
+    pop pointer 0
+    push this 2
+    push constant 2
+    gt
+    not
+    if-goto Rectangle_3
+    push pointer 0
+    call Rectangle.erase 1
+    pop temp 0
+    push this 2
+    push constant 2
+    sub
+    pop this 2
+    push pointer 0
+    call Rectangle.draw 1
+    pop temp 0
+    goto Rectangle_2
+label Rectangle_3
+label Rectangle_2
+    push constant 0
+    return
+function Rectangle.incYSize 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    push this 3
+    add
+    push constant 254
+    lt
+    push this 0
+    push this 2
+    add
+    push constant 510
+    lt
+    and
+    not
+    if-goto Rectangle_5
+    push pointer 0
+    call Rectangle.erase 1
+    pop temp 0
+    push this 3
+    push constant 2
+    add
+    pop this 3
+    push pointer 0
+    call Rectangle.draw 1
+    pop temp 0
+    goto Rectangle_4
+label Rectangle_5
+label Rectangle_4
+    push constant 0
+    return
+function Rectangle.decYSize 0
+    push argument 0
+    pop pointer 0
+    push this 3
+    push constant 2
+    gt
+    not
+    if-goto Rectangle_7
+    push pointer 0
+    call Rectangle.erase 1
+    pop temp 0
+    push this 3
+    push constant 2
+    sub
+    pop this 3
+    push pointer 0
+    call Rectangle.draw 1
+    pop temp 0
+    goto Rectangle_6
+label Rectangle_7
+label Rectangle_6
+    push constant 0
+    return
+function Rectangle.moveUp 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    push constant 1
+    gt
+    not
+    if-goto Rectangle_9
+    push constant 0
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 1
+    push this 3
+    add
+    push constant 1
+    sub
+    push this 0
+    push this 2
+    add
+    push this 1
+    push this 3
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push this 1
+    push constant 2
+    sub
+    pop this 1
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 1
+    push this 0
+    push this 2
+    add
+    push this 1
+    push constant 1
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    goto Rectangle_8
+label Rectangle_9
+label Rectangle_8
+    push constant 0
+    return
+function Rectangle.moveDown 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    push this 3
+    add
+    push constant 254
+    lt
+    not
+    if-goto Rectangle_11
+    push constant 0
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 1
+    push this 0
+    push this 2
+    add
+    push this 1
+    push constant 1
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push this 1
+    push constant 2
+    add
+    pop this 1
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 1
+    push this 3
+    add
+    push constant 1
+    sub
+    push this 0
+    push this 2
+    add
+    push this 1
+    push this 3
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    goto Rectangle_10
+label Rectangle_11
+label Rectangle_10
+    push constant 0
+    return
+function Rectangle.moveLeft 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    push constant 1
+    gt
+    not
+    if-goto Rectangle_13
+    push constant 0
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 2
+    add
+    push constant 1
+    sub
+    push this 1
+    push this 0
+    push this 2
+    add
+    push this 1
+    push this 3
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push this 0
+    push constant 2
+    sub
+    pop this 0
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 1
+    push this 0
+    push constant 1
+    add
+    push this 1
+    push this 3
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    goto Rectangle_12
+label Rectangle_13
+label Rectangle_12
+    push constant 0
+    return
+function Rectangle.moveRight 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    push this 2
+    add
+    push constant 510
+    lt
+    not
+    if-goto Rectangle_15
+    push constant 0
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 1
+    push this 0
+    push constant 1
+    add
+    push this 1
+    push this 3
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push this 0
+    push constant 2
+    add
+    pop this 0
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 2
+    add
+    push constant 1
+    sub
+    push this 1
+    push this 0
+    push this 2
+    add
+    push this 1
+    push this 3
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    goto Rectangle_14
+label Rectangle_15
+label Rectangle_14
+    push constant 0
+    return

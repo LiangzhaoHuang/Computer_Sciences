@@ -1,0 +1,90 @@
+/**
+ * Implements the Rectangle game.
+ * This simple game allows the user to move a black rectangle around
+ * the screen, and change the rectangle's size during the movement.
+ * When the game starts, a rectangle of 30 by 30 pixels is shown at the
+ * top-left corner of the screen. The user controls the rectangle as follows.
+ * The 4 arrow keys are used to move the rectangle up, down, left, and right.
+ * The 'x' and 'X' keys are used, respectively, to decrement and increment along the x direction
+ * The 'y' and 'Y' keys are used, respectively, to decrement and increment along the y direction
+ * the rectangle's size. The 'Q' key is used to quit the game.
+ */
+class RectangleGame {
+   field Rectangle rectangle; // the rectangle of this game
+   field int direction; // the rectangle's current direction: 
+                        // 0=none, 1=up, 2=down, 3=left, 4=right
+
+   /** Constructs a new rectangle game. */
+   constructor RectangleGame new() {
+      // The initial rectangle is located in (0,0), has size 30, and is not moving.
+      let rectangle = Rectangle.new(0, 0, 30, 30);
+      let direction = 0;
+      return this;
+   }
+
+   /** Disposes this game. */
+   method void dispose() {
+      do rectangle.dispose();
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   /** Moves the rectangle in the current direction. */
+   method void moveRectangle() {
+      if (direction = 1) { do rectangle.moveUp(); }
+      if (direction = 2) { do rectangle.moveDown(); }
+      if (direction = 3) { do rectangle.moveLeft(); }
+      if (direction = 4) { do rectangle.moveRight(); }
+      do Sys.wait(5);  // delays the next movement
+      return;
+   }
+
+   /** Runs the game: handles the user's inputs and moves the rectangle accordingly */
+   method void run() {
+      var char key;  // the key currently pressed by the user
+      var boolean exit;
+      let exit = false;
+      
+      while (~exit) {
+         // waits for a key to be pressed
+         while (key = 0) {
+            let key = Keyboard.keyPressed();
+            let direction = 0;
+         }
+         if (key = 81)  { 
+            let exit = true;
+            let direction = 0; 
+         }     // q key
+         if (key = 120)  { 
+            do rectangle.decXSize(); 
+            let direction = 0;
+         } // x key
+         if (key = 88)  { 
+            do rectangle.incXSize();
+            let direction = 0; 
+         } // X key
+         if (key = 121)  { 
+            do rectangle.decYSize(); 
+            let direction = 0;
+         } // y key
+         if (key = 89)  { 
+            do rectangle.incYSize();
+            let direction = 0; 
+         } // Y key
+         if (key = 131) { let direction = 1; }   // up arrow
+         if (key = 133) { let direction = 2; }   // down arrow
+         if (key = 130) { let direction = 3; }   // left arrow
+         if (key = 132) { let direction = 4; }   // right arrow
+
+         // waits for the key to be released
+         while (~(key = 0)) {
+            let key = Keyboard.keyPressed();
+            do moveRectangle();
+         }
+     } // while
+     return;
+   }
+}
+
+
+

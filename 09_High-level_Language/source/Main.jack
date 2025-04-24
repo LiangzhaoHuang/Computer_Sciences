@@ -1,0 +1,10 @@
+/** Initializes a new Square game and starts running it. */
+class Main {
+    function void main() {
+        var RectangleGame game;
+        let game = RectangleGame.new();
+        do game.run();
+        do game.dispose();
+        return;
+    }
+}

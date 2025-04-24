@@ -1,0 +1,222 @@
+function RectangleGame.new 0
+    push constant 2
+    call Memory.alloc 1
+    pop pointer 0
+    push constant 0
+    push constant 0
+    push constant 30
+    push constant 30
+    call Rectangle.new 4
+    pop this 0
+    push constant 0
+    pop this 1
+    push pointer 0
+    return
+function RectangleGame.dispose 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    call Rectangle.dispose 1
+    pop temp 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return
+function RectangleGame.moveRectangle 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    push constant 1
+    eq
+    not
+    if-goto RectangleGame_1
+    push this 0
+    call Rectangle.moveUp 1
+    pop temp 0
+    goto RectangleGame_0
+label RectangleGame_1
+label RectangleGame_0
+    push this 1
+    push constant 2
+    eq
+    not
+    if-goto RectangleGame_3
+    push this 0
+    call Rectangle.moveDown 1
+    pop temp 0
+    goto RectangleGame_2
+label RectangleGame_3
+label RectangleGame_2
+    push this 1
+    push constant 3
+    eq
+    not
+    if-goto RectangleGame_5
+    push this 0
+    call Rectangle.moveLeft 1
+    pop temp 0
+    goto RectangleGame_4
+label RectangleGame_5
+label RectangleGame_4
+    push this 1
+    push constant 4
+    eq
+    not
+    if-goto RectangleGame_7
+    push this 0
+    call Rectangle.moveRight 1
+    pop temp 0
+    goto RectangleGame_6
+label RectangleGame_7
+label RectangleGame_6
+    push constant 5
+    call Sys.wait 1
+    pop temp 0
+    push constant 0
+    return
+function RectangleGame.run 2
+    push argument 0
+    pop pointer 0
+    push constant 0
+    pop local 1
+label RectangleGame_8
+    push local 1
+    not
+    not
+    if-goto RectangleGame_9
+label RectangleGame_10
+    push local 0
+    push constant 0
+    eq
+    not
+    if-goto RectangleGame_11
+    call Keyboard.keyPressed 0
+    pop local 0
+    push constant 0
+    pop this 1
+    goto RectangleGame_10
+label RectangleGame_11
+    push local 0
+    push constant 81
+    eq
+    not
+    if-goto RectangleGame_13
+    push constant 1
+    neg
+    pop local 1
+    push constant 0
+    pop this 1
+    goto RectangleGame_12
+label RectangleGame_13
+label RectangleGame_12
+    push local 0
+    push constant 120
+    eq
+    not
+    if-goto RectangleGame_15
+    push this 0
+    call Rectangle.decXSize 1
+    pop temp 0
+    push constant 0
+    pop this 1
+    goto RectangleGame_14
+label RectangleGame_15
+label RectangleGame_14
+    push local 0
+    push constant 88
+    eq
+    not
+    if-goto RectangleGame_17
+    push this 0
+    call Rectangle.incXSize 1
+    pop temp 0
+    push constant 0
+    pop this 1
+    goto RectangleGame_16
+label RectangleGame_17
+label RectangleGame_16
+    push local 0
+    push constant 121
+    eq
+    not
+    if-goto RectangleGame_19
+    push this 0
+    call Rectangle.decYSize 1
+    pop temp 0
+    push constant 0
+    pop this 1
+    goto RectangleGame_18
+label RectangleGame_19
+label RectangleGame_18
+    push local 0
+    push constant 89
+    eq
+    not
+    if-goto RectangleGame_21
+    push this 0
+    call Rectangle.incYSize 1
+    pop temp 0
+    push constant 0
+    pop this 1
+    goto RectangleGame_20
+label RectangleGame_21
+label RectangleGame_20
+    push local 0
+    push constant 131
+    eq
+    not
+    if-goto RectangleGame_23
+    push constant 1
+    pop this 1
+    goto RectangleGame_22
+label RectangleGame_23
+label RectangleGame_22
+    push local 0
+    push constant 133
+    eq
+    not
+    if-goto RectangleGame_25
+    push constant 2
+    pop this 1
+    goto RectangleGame_24
+label RectangleGame_25
+label RectangleGame_24
+    push local 0
+    push constant 130
+    eq
+    not
+    if-goto RectangleGame_27
+    push constant 3
+    pop this 1
+    goto RectangleGame_26
+label RectangleGame_27
+label RectangleGame_26
+    push local 0
+    push constant 132
+    eq
+    not
+    if-goto RectangleGame_29
+    push constant 4
+    pop this 1
+    goto RectangleGame_28
+label RectangleGame_29
+label RectangleGame_28
+label RectangleGame_30
+    push local 0
+    push constant 0
+    eq
+    not
+    not
+    if-goto RectangleGame_31
+    call Keyboard.keyPressed 0
+    pop local 0
+    push pointer 0
+    call RectangleGame.moveRectangle 1
+    pop temp 0
+    goto RectangleGame_30
+label RectangleGame_31
+    goto RectangleGame_8
+label RectangleGame_9
+    push constant 0
+    return
