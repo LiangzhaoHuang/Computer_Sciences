@@ -1,0 +1,161 @@
+class Math {
+    static int n;
+    static Array powersOfTwo;
+
+    function void init() {
+        var int i;
+        let n = 16;
+        let powersOfTwo = Array.new(n);
+        let powersOfTwo[0] = 1;
+        let i = 1;
+        while (i < n) {
+            let powersOfTwo[i] = powersOfTwo[i - 1] + powersOfTwo[i - 1];
+            let i = i + 1;
+        }
+        return;
+    }
+
+    function int multiply(int x, int y) {
+        var int result, current, i, mask;
+        let result = 0;
+        let current = x;
+        let i = 0;
+        while (i < n) {
+            let mask = powersOfTwo[i];
+            if ((y & mask) = mask) {
+                let result = result + current;
+            }
+            let current = current + current;
+            let i = i + 1;
+        }
+        return result;
+    }
+
+    /** Returns x / y using binary long division. Handles negative x and y. **/
+    function int divide(int x, int y) {
+        var int sign, quotient, xAbs, yAbs, shift, tempY, power, i, k;
+
+        let sign = 1;
+        let quotient = 0;
+
+        // Handle sign of x
+        if (x < 0) {
+            let x = 0 - x;
+            let sign = 0 - sign;
+        }
+
+        // Handle sign of y
+        if (y < 0) {
+            let y = 0 - y;
+            let sign = 0 - sign;
+        }
+
+        let xAbs = x;
+        let yAbs = y;
+
+        // Find the max shift such that (yAbs << shift) <= xAbs
+        let shift = 0;
+        let tempY = yAbs;
+        while (tempY < xAbs) {
+            let tempY = tempY + tempY;
+            let shift = shift + 1;
+        }
+
+        // If tempY > xAbs, reduce shift by 1
+        let i = 0;
+        let tempY = yAbs;
+        while (i < shift) {
+            let tempY = tempY + tempY;
+            let i = i + 1;
+        }
+        if (tempY > xAbs) {
+            let shift = shift - 1;
+        }
+
+        // Perform the division
+        while (~(shift < 0)) {
+            // Compute yAbs * 2^shift (repeated doubling)
+            let tempY = yAbs;
+            let k = 0;
+            while (k < shift) {
+                let tempY = tempY + tempY;
+                let k = k + 1;
+            }
+
+            if (~(xAbs < tempY)) {
+                let xAbs = xAbs - tempY;
+
+                // Compute 2^shift
+                let power = 1;
+                let k = 0;
+                while (k < shift) {
+                    let power = power + power;
+                    let k = k + 1;
+                }
+
+                let quotient = quotient + power;
+            }
+
+            let shift = shift - 1;
+        }
+
+        // Apply sign
+        if (sign < 0) {
+            return 0 - quotient;
+        }
+        return quotient;
+    }
+
+    function int sqrt(int x) {
+        var int low, high, mid, sq, temp;
+
+        let low = 0;
+        let high = 181;  // sqrt(32761) = 181
+
+        while (~(low = high)) {
+            // mid = (low + high + 1) / 2
+            let temp = low + high;
+            let temp = temp + 1;
+            let mid = Math.divide(temp, 2);
+
+            let sq = Math.multiply(mid, mid);
+
+            if (sq < x) {
+                let low = mid;
+            }
+
+            if (x < sq) {
+                let high = mid + (-1);
+            }
+
+            if (sq = x) {
+                return mid;
+            }
+        }
+
+        return low;
+    }
+
+
+    function int max(int a, int b) {
+        if (a > b) {
+            return a;
+        }
+        return b;
+    }
+
+    function int min(int a, int b) {
+        if (a < b) {
+            return a;
+        }
+        return b;
+    }
+
+    function int abs(int x) {
+        if (x < 0) {
+            return 0 - x;
+        }
+        return x;
+    }
+}
+

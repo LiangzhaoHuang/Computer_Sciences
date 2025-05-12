@@ -1,0 +1,69 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+/**
+ * This library provides two services: direct access to the computer's main
+ * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
+ * consists of 32,768 words, each holding a 16-bit binary number.
+ */ 
+/**
+ * Provides low-level access to the Hack computer's memory.
+ */
+class Memory {
+    static Array ram;
+
+    /** Initializes the RAM access base and the heap/free list. */
+    function void init() {
+        let ram = 0;
+        if (ram[2048] = 0) {
+            let ram[2048] = 2050; // Heap starts at 2050
+        }
+        let ram[2049] = 0; // Head of free list
+        return;
+    }
+
+    /** Reads from RAM[address]. */
+    function int peek(int address) {
+        return ram[address];
+    }
+
+    /** Writes value into RAM[address]. */
+    function void poke(int address, int value) {
+        let ram[address] = value;
+        return;
+    }
+
+    /** Allocates memory block and returns it as an Array */
+    function Array alloc(int size) {
+        var Array block;
+        var int free, base, next;
+
+        // Check free list
+        let free = ram[2049];
+        if (free = 0) {
+            let base = ram[2048];
+            let next = base + size;
+            let ram[2048] = next;
+            let block = base;
+            return block;
+        }
+
+        // Reuse block from free list
+        let base = free;
+        let ram[2049] = ram[base]; // Update free list head
+        let block = base;
+        return block;
+    }
+
+    /** Deallocates a previously allocated block (passed as Array). */
+    function void deAlloc(Array o) {
+        // Store current free list head at o[0]
+        let o[0] = ram[2049];
+        // Update head of the free list
+        let ram[2049] = o;
+        return;
+    }
+
+}
+

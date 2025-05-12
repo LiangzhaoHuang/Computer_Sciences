@@ -1,0 +1,196 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Screen.jack
+/**
+ * A library of functions for displaying graphics on the screen.
+ * The Hack physical screen consists of 512 rows (indexed 0..511, top to bottom)
+ * of 256 pixels each (indexed 0..255, left to right). The top left pixel on 
+ * the screen is indexed (0,0).
+ */
+/**
+ * A library of functions for displaying graphics on the screen.
+ * The Hack physical screen consists of 512 rows (indexed 0..511, top to bottom)
+ * of 256 pixels each (indexed 0..255, left to right). The top left pixel on 
+ * the screen is indexed (0,0).
+ */
+class Screen {
+    static int baseAddress; // 16384
+    static boolean color;   // true = black, false = white
+
+    function void init() {
+        let baseAddress = 16384;
+        let color = true;
+        return;
+    }
+
+    function int powerOfTwo(int exp) {
+        var int result, i;
+        let result = 1;
+        let i = 0;
+        while (i < exp) {
+            let result = result + result;
+            let i = i + 1;
+        }
+        return result;
+    }
+
+    function void setColor(boolean b) {
+        let color = b;
+        return;
+    }
+
+    function void clearScreen() {
+        var int i;
+        let i = 0;
+        while (i < 8192) {
+            do Memory.poke(baseAddress + i, 0);
+            let i = i + 1;
+        }
+        return;
+    }
+
+    function void drawPixel(int x, int y) {
+        var int address, value, bitOffset, bitMask;
+
+        // Compute screen memory address:
+        let address = Math.multiply(y, 32);                   // y * 32
+        let address = address + Math.divide(x, 16);           // + x / 16
+        let address = address + 16384;                        // + baseAddress
+
+        // Compute bit offset within the 16-bit word:
+        let bitOffset = x - Math.multiply(Math.divide(x, 16), 16);  // x % 16
+
+        // Compute bitMask = 2^bitOffset
+        let bitMask = 1;
+        while (bitOffset > 0) {
+            let bitMask = bitMask + bitMask;
+            let bitOffset = bitOffset - 1;
+        }
+
+        // Read current 16-bit word from screen memory
+        let value = Memory.peek(address);
+
+        // Set or clear the bit depending on current color
+        if (color) {
+            let value = value | bitMask;                 // Set bit
+        } else {
+            let value = value & (~bitMask);              // Clear bit
+        }
+
+        // Write the modified word back to memory
+        do Memory.poke(address, value);
+        return;
+    }
+
+
+    function void drawLine(int x1, int y1, int x2, int y2) {
+        var int dx, dy, sx, sy, err, e2;
+
+        let dx = Math.abs(x2 - x1);
+        let dy = Math.abs(y2 - y1);
+
+        // Determine step directions
+        if (x1 < x2) {
+            let sx = 1;
+        } else {
+            let sx = -1;
+        }
+
+        if (y1 < y2) {
+            let sy = 1;
+        } else {
+            let sy = -1;
+        }
+
+        let err = dx - dy;
+
+        while (true) {
+            do Screen.drawPixel(x1, y1);
+
+            // Exit if reached destination
+            if (x1 = x2) {
+                if (y1 = y2) {
+                    return;
+                }
+            }
+
+            let e2 = err + err;
+
+            if (e2 > -dy) {
+                let err = err - dy;
+                let x1 = x1 + sx;
+            }
+
+            if (e2 < dx) {
+                let err = err + dx;
+                let y1 = y1 + sy;
+            }
+        }
+        return;
+    }
+
+
+
+
+    function void drawRectangle(int x1, int y1, int x2, int y2) {
+        var int y;
+        let y = y1;
+        while (~(y > y2)) {
+            do Screen.drawLine(x1, y, x2, y);
+            let y = y + 1;
+        }
+        return;
+    }
+
+    /*
+    function void drawCircle(int x0, int y0, int r) {
+        var int x, y, err;
+        let x = r;
+        let y = 0;
+        let err = 0;
+
+        while (~(x < y)) {
+            do Screen.drawPixel(x0 + x, y0 + y);
+            do Screen.drawPixel(x0 + y, y0 + x);
+            do Screen.drawPixel(x0 - y, y0 + x);
+            do Screen.drawPixel(x0 - x, y0 + y);
+            do Screen.drawPixel(x0 - x, y0 - y);
+            do Screen.drawPixel(x0 - y, y0 - x);
+            do Screen.drawPixel(x0 + y, y0 - x);
+            do Screen.drawPixel(x0 + x, y0 - y);
+
+            let y = y + 1;
+            let err = err + 1 + y + y;
+            if ((err - x - x + 1 + 1) > 0) {
+                let x = x - 1;
+                let err = err + 1 - x - x;
+            }
+        }
+        return;
+    }
+    */
+    function void drawCircle(int x, int y, int r) {
+    var int dy, dxSquared, rSquared, dx;
+
+    let dy = 0;
+    let rSquared = Math.multiply(r, r);
+
+    // from dy = -r to r
+    while (~(dy > r)) {
+        // dx^2 = r^2 - dy^2
+        let dxSquared = rSquared - Math.multiply(dy, dy);
+        let dx = Math.sqrt(dxSquared);  // integer sqrt
+
+        // draw horizontal line at y+dy
+        do Screen.drawLine(x - dx, y + dy, x + dx, y + dy);
+        // draw symmetric line at y-dy
+        do Screen.drawLine(x - dx, y - dy, x + dx, y - dy);
+
+        let dy = dy + 1;
+    }
+
+    return;
+}
+}
+
